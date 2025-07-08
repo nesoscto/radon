@@ -1,0 +1,205 @@
+Original Project Description
+--------------------------
+We need to build a webapp with the following functions:
+
+1. Enable user registration
+2. Login and password recovery
+> 2. Enable user to modify their profile (standard things like address phone number etc) and change their password
+> 3. Enable the user to add a device by scanning a qr code containing the device serial number
+> 4. Display the devices and status
+> 5. Enable to the user to create alerts for thresholds (typically a value of 200). The alert can be an email notification
+
+Besides the API that the backend exposes for the frontend to consume, we need an extra endpoint that will receive a jSON payload with the sensor reading data.
+The sensor data will be a json object with four attributes:
+- serial number (matches the serial number scanned by the users from the QR code)
+- signal value,
+- rssr signal strenght
+- timestamp
+
+This endpoint should use token authentication.
+When we receive a sensor value above a certain threshold (configured in the code), an alert email should be sent to the user that registered that serial number, if any.
+
+The frontend should display:
+- the most recent sensor reading
+- the signal strength as a gauge 0-100%
+- the average values for the last 7, 24 and 30 days
+- a simple chart with the trend for the last 30 days
+
+The backend should use  Django, Django rest framework  and postgresql for the database.
+
+The frontend should be a React application.
+
+We'll also need a development environment based on docker and docker compose.
+
+---
+
+Radon IoT Webapp Development Log (Steps 1-5)
+============================================
+
+**Step 1: Project & Docker Compose Setup**
+- Created backend/ (Django+DRF), frontend/ (React), docker-compose.yml, README.md
+- Docker Compose services: backend, db (PostgreSQL), frontend, maildev
+- Dockerfiles and minimal dependency files for backend and frontend
+
+**Step 2: Backend Scaffolding & Configuration**
+- Django project and core app initialized
+- PostgreSQL configured via env vars
+- Email backend set for maildev
+- DRF and authtoken added to INSTALLED_APPS
+- DRF authentication and permission defaults set
+- .env.example content provided
+- Migrations run, admin enabled, superuser created
+
+**Step 3: User Management Endpoints and Tests**
+- UserProfile model (address, phone, timestamps) with signals for auto-creation
+- Registration: username, email, password only
+- Profile view/edit: address, phone
+- Password change and password reset (email)
+- Token-based login
+- All endpoints covered by unit tests
+
+**Step 4: Device Management Endpoints and Tests**
+- Device model: serial_number (unique), user (FK), timestamps
+- Device admin registration
+- Endpoints: add device, list devices, device detail
+- Permissions: users can only access their own devices
+- All endpoints covered by unit tests
+
+**Step 5: Sensor Data Ingestion Endpoint and Alert Logic**
+- SensorReading model: device (FK), value, rssi, timestamp, timestamps
+- Token-authenticated ingestion endpoint: accepts serial_number, value, rssi, timestamp
+- Stores reading, triggers alert email if value > threshold (from settings)
+- All logic covered by unit tests
+
+**Ready for Step 6:**
+- Implement single dashboard API endpoint for frontend sensor data display (recent reading, gauge, averages, trend)
+
+**Notes:**
+- All models inherit from TimeStampedModel (date_created, date_updated)
+- All tests pass as of end of Step 5
+- Next session: start with Step 6 (dashboard API)
+
+---
+
+Full Step-by-Step Implementation Plan (for reference)
+-----------------------------------------------------
+
+1. Project & Docker Compose setup ✅
+2. Backend scaffolding & config ✅
+3. User management endpoints & tests ✅
+4. Device management endpoints & tests ✅
+5. Sensor data ingestion endpoint & alert logic ✅
+6. Sensor Data Dashboard API (single endpoint for frontend)
+    - Implement a single endpoint that returns all required sensor data for the frontend dashboard (recent reading, gauge, averages, trend) for a device.
+    - Write unit tests for this endpoint.
+7. Frontend scaffolding & config
+    - Scaffold React app and configure API client.
+8. Frontend user flows
+    - Registration, login, password recovery, profile management UI.
+9. Frontend device flows
+    - Add device (QR code scanner), list devices, show status.
+10. Frontend sensor data display
+    - Show most recent reading, signal gauge, averages, and trend chart.
+11. Testing & QA
+    - Frontend component and e2e tests as features are implemented.
+12. Documentation
+    - API documentation (Swagger/OpenAPI).
+    - README for setup and usage.
+
+---
+
+Legend: ✅ = complete 
+
+---
+
+## Session Log: 2025-07-09
+
+### Backend
+- Switched authentication from DRF TokenAuth to JWT using djangorestframework-simplejwt.
+- Added `/api/jwt/login/` and `/api/jwt/refresh/` endpoints for JWT auth.
+- Removed old `/api/login/` TokenAuth endpoint.
+- Configured DRF to use only JWTAuthentication for API endpoints.
+- Installed and configured django-cors-headers:
+  - CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
+  - CORS_ALLOW_CREDENTIALS = True
+- Added CSRF_TRUSTED_ORIGINS = ["http://localhost:5173"]
+- Fixed registration bug: removed duplicate UserProfile creation in serializer (now only created by signal).
+
+### Frontend
+- Switched to Vite for React app (Node 20, port 5173).
+- Installed MUI, React Router, Axios.
+- Set up project structure: `src/api/`, `src/components/`, `src/pages/`.
+- Implemented JWT login flow:
+  - Login form posts to `/api/jwt/login/`, stores access/refresh tokens, redirects to dashboard.
+  - Axios client attaches JWT to all requests, refreshes token on 401, logs out if refresh fails.
+- Implemented registration flow:
+  - Registration form posts to `/api/register/`, redirects to login on success.
+- Fixed CORS and CSRF errors by updating backend settings and removing withCredentials from Axios.
+- Confirmed registration and login work end-to-end.
+
+### Decisions & Best Practices
+- Use JWT for all frontend authentication.
+- On 401, try to refresh token; logout if refresh fails.
+- After registration, redirect to login (do not auto-login).
+- All frontend design must be responsive and mobile-friendly (using MUI's grid and breakpoints).
+- For CORS, allow only the frontend dev origin in dev; in prod, set to your real frontend domain(s).
+- For CSRF, only needed for session/cookie auth; not for JWT-protected API endpoints.
+
+### Next Steps
+- Add logout button and protected route logic.
+- Implement password recovery and profile management flows.
+- Continue building out dashboard and device management UI.
+
+--- 
+
+---
+## Devlog: 2025-07-10
+
+### What we did today
+- Implemented device management page: lists devices, allows adding via QR code scan (using @yudiel/react-qr-scanner, React 19 compatible)
+- Implemented dashboard page: shows all user devices, each with recent reading, averages, and a trend chart (Recharts)
+- Installed and configured all required frontend dependencies in Docker
+- Designed and implemented secure ingestion endpoint authentication:
+  - Created a custom DRF authentication class for a central collector API key
+  - Updated ingestion endpoint to use this API key (not user/device tokens)
+  - Documented HTTPie usage for posting sensor readings with the new API key
+- Verified and fixed HTTPie usage for JSON payloads
+- Kept all other endpoints using JWT or user auth as appropriate
+- Maintained code quality and linter compliance
+
+### Plan for tomorrow
+- Test end-to-end sensor ingestion with the central collector API key
+- Test dashboard and device flows with real/test data
+- Add error handling and loading polish to frontend (spinners, alerts, etc)
+- (Optional) Add device removal and device details page
+- (Optional) Add admin UI for managing/rotating the central API key
+- Review mobile UX and polish responsive design
+- Update README and documentation for new ingestion flow
+- Plan next features: alert history, user notifications, or device provisioning improvements
+
+--- 
+
+---
+## Devlog: 2025-07-11
+
+### What we did today
+- Implemented alert email toggle:
+  - Added `alert_email_enabled` boolean to UserProfile (default True)
+  - Updated backend serializer, API, and alert logic to respect this toggle
+  - Added migration and updated all relevant tests
+  - Updated frontend profile page to include a toggle switch for alert emails
+- Improved API key authentication:
+  - Ensured both missing and invalid API key cases return 401 (with proper DRF custom authentication header)
+  - Added/updated tests for both missing and invalid API key scenarios
+- Improved sensor ingestion test script:
+  - Now reads a template JSON, injects dynamic values (timestamp, value, rssi, deduplicationId, device serial)
+  - No longer modifies the template file
+- Maintained and extended test coverage:
+  - All profile, ingestion, and dashboard tests updated for new fields and logic
+  - Confirmed all tests pass after migrations and code changes
+
+### Next steps
+- Continue feature development or polish as needed (let's review priorities at next session)
+- Consider further UX/UI improvements or admin features as time allows
+
+--- 

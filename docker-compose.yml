@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: radon
+      POSTGRES_USER: radonuser
+      POSTGRES_PASSWORD: radonpass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    #command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: ./run_server.sh
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      - DJANGO_DB_HOST=db
+      - DJANGO_DB_NAME=radon
+      - DJANGO_DB_USER=radonuser
+      - DJANGO_DB_PASSWORD=radonpass
+      - EMAIL_HOST=maildev
+      - EMAIL_PORT=1025
+      - HOSTNAME=localhost
+    depends_on:
+      - db
+      - maildev
+
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend
+
+  maildev:
+    image: maildev/maildev
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
+volumes:
+  postgres_data: 

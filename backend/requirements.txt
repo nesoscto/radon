@@ -1,0 +1,9 @@
+Django>=4.2
+djangorestframework
+psycopg2-binary 
+djangorestframework-simplejwt 
+django-cors-headers
+django-allauth==65.3.0
+dj-rest-auth
+requests
+paho-mqtt

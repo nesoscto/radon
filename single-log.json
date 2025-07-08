@@ -1,0 +1,78 @@
+{
+    "deduplicationId": "04fae026-fc08-4704-bc96-a0291992d58c",
+    "time": "2025-07-07T11:10:50.263380+00:00",
+    "deviceInfo": {
+        "tenantId": "772dbfce-d838-4b4f-b66e-b6550f18e3ed",
+        "tenantName": "Radon_Sensor_Testing",
+        "applicationId": "50c4db63-0f74-4b5a-8d4c-964f238a786d",
+        "applicationName": "Joe",
+        "deviceProfileId": "ffccbdfc-55e0-4009-a7f4-37783ea5f1de",
+        "deviceProfileName": "JoeCodec",
+        "deviceName": "07",
+        "devEui": "0123456789abcd11",
+        "deviceClassEnabled": "CLASS_A",
+        "tags": {}
+    },
+    "devAddr": "01766be6",
+    "adr": true,
+    "dr": 5,
+    "fCnt": 395,
+    "fPort": 10,
+    "confirmed": true,
+    "data": "Iw==",
+    "object": {
+        "hexdata": "23"
+    },
+    "rxInfo": [
+        {
+            "gatewayId": "a84041ffff24a7c0",
+            "uplinkId": 8587,
+            "gwTime": "2025-07-07T11:10:50.263380+00:00",
+            "nsTime": "2025-07-07T11:10:50.299345603+00:00",
+            "rssi": -64,
+            "snr": 14.2,
+            "channel": 1,
+            "rfChain": 1,
+            "location": {
+                "latitude": 49.18536,
+                "longitude": -2.11014,
+                "altitude": 50
+            },
+            "context": "hnGxWg==",
+            "metadata": {
+                "region_config_id": "eu868",
+                "region_common_name": "EU868"
+            },
+            "crcStatus": "CRC_OK"
+        },
+        {
+            "gatewayId": "40d63cfffe851125",
+            "uplinkId": 27129,
+            "nsTime": "2025-07-07T11:10:50.262494061+00:00",
+            "rssi": -81,
+            "snr": 13.5,
+            "channel": 1,
+            "rfChain": 1,
+            "location": {
+                "latitude": 49.1652632,
+                "longitude": -2.0803193
+            },
+            "context": "mVTZ1w==",
+            "metadata": {
+                "region_common_name": "EU868",
+                "region_config_id": "eu868"
+            },
+            "crcStatus": "CRC_OK"
+        }
+    ],
+    "txInfo": {
+        "frequency": 868300000,
+        "modulation": {
+            "lora": {
+                "bandwidth": 125000,
+                "spreadingFactor": 7,
+                "codeRate": "CR_4_5"
+            }
+        }
+    }
+}
