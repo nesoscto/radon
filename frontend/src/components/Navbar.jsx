@@ -5,6 +5,7 @@ import LogoutButton from './LogoutButton';
 import { isAuthenticated } from '../api/client';
 import { useState } from 'react';
 import nesosLogo from '../assets/nesos-logo.png';
+import { COLORS } from '../theme';
 
 function Navbar() {
   const location = useLocation();
@@ -26,7 +27,7 @@ function Navbar() {
     },
     '&.Mui-selected, &[aria-current="page"]': {
       backgroundColor: '#fff',
-      color: '#1976d2',
+      color: COLORS.PRIMARY,
     },
   };
   return (
@@ -61,7 +62,7 @@ function Navbar() {
                 key={link.to}
                 component={RouterLink}
                 to={link.to}
-                sx={{ ...navButtonStyle, ...(location.pathname === link.to && { backgroundColor: '#fff', color: '#1976d2' }) }}
+                sx={{ ...navButtonStyle, ...(location.pathname === link.to && { backgroundColor: '#fff', color: COLORS.PRIMARY }) }}
               >
                 {link.label}
               </Button>
