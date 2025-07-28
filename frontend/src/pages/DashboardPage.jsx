@@ -33,8 +33,10 @@ function DeviceDashboard({ device }) {
   if (!data) return null;
 
   const { recent_reading, averages, trend } = data;
-  const threshold = Number(import.meta.env.VITE_RADON_THRESHOLD) || 200;
-  const alert = recent_reading.value && recent_reading.value > threshold;
+  const alertThreshold = Number(import.meta.env.RADON_ALERT_THRESHOLD) || 200;
+  const warningThreshold = Number(import.meta.env.RADON_WARNING_THRESHOLD) || 150;
+  const alert = recent_reading.value && recent_reading.value > alertThreshold;
+  const warning = recent_reading.value && recent_reading.value > warningThreshold && recent_reading.value <= alertThreshold;
   const units = (<>bq/m<sup>3</sup></>);
 
   return (
@@ -42,9 +44,14 @@ function DeviceDashboard({ device }) {
       <CardContent>
         <Typography variant="h6" sx={{ mb: 2 }}>Device: {device.serial_number}</Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
-          <RadonGauge value={recent_reading.value ?? 0} threshold={threshold} />
+          <RadonGauge 
+            value={recent_reading.value ?? 0} 
+            alertThreshold={alertThreshold}
+            warningThreshold={warningThreshold}
+          />
         </Box>
-        {alert && <Alert severity="warning" sx={{ mb: 2 }}>Alert: Recent value {recent_reading.value} exceeds threshold!</Alert>}
+        {alert && <Alert severity="error" sx={{ mb: 2 }}>Alert: Recent value {recent_reading.value} exceeds alert threshold!</Alert>}
+        {warning && <Alert severity="warning" sx={{ mb: 2 }}>Warning: Recent value {recent_reading.value} exceeds warning threshold!</Alert>}
         <Box sx={{ width: '100%', maxWidth: 400, mx: 'auto', mb: 2 }}>
           <ResponsiveContainer width="100%" height={120}>
             <LineChart data={trend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>

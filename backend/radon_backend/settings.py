@@ -172,6 +172,7 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+SENSOR_WARNING_THRESHOLD = int(os.environ.get("SENSOR_WARNING_THRESHOLD", 150))
 SENSOR_ALERT_THRESHOLD = int(os.environ.get("SENSOR_ALERT_THRESHOLD", 200))
 
 FRONTEND_URL = os.environ.get('FRONTEND_URL', "http://localhost:5173")

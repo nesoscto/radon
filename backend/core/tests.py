@@ -162,6 +162,16 @@ class SensorReadingIngestTests(TestCase):
         process_message(payload)
         self.assertEqual(SensorReading.objects.all().count(), 0)
 
+    def test_warning_triggered(self):
+        payload = self.base_payload.copy()
+        payload["object"] = {"hexdata": "151"}
+        payload["deduplicationId"] = "test-dedup-id-3"
+        process_message(payload)
+        self.assertEqual(SensorReading.objects.all().count(), 1)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('sensor@example.com', mail.outbox[0].to)
+        self.assertIn('Sensor Alert', mail.outbox[0].subject)
+
     def test_alert_triggered(self):
         payload = self.base_payload.copy()
         payload["object"] = {"hexdata": "201"}
@@ -170,6 +180,7 @@ class SensorReadingIngestTests(TestCase):
         self.assertEqual(SensorReading.objects.all().count(), 1)
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn('sensor@example.com', mail.outbox[0].to)
+        self.assertIn('Sensor Alert - Action Needed', mail.outbox[0].subject)
 
     def test_alert_triggered_multiple_users(self):
         user2 = User.objects.create_user(username='sensoruser2', email='sensor2@example.com', password='sensorpass2')

@@ -55,13 +55,24 @@ def process_message(obj):
         logger.info('Duplicate deduplicationId: %s', deduplicationId)
         return
     # Alert logic
-    threshold = getattr(settings, 'SENSOR_ALERT_THRESHOLD', 200)
-    if reading.value > threshold:
+    alert_threshold = settings.SENSOR_ALERT_THRESHOLD
+    warning_threshold = settings.SENSOR_WARNING_THRESHOLD
+    if reading.value > alert_threshold:
         for user in device.users.filter(profile__alert_email_enabled=True):
             send_mail(
-                subject='Sensor Alert',
-                message=f'Sensor {device.serial_number} value {reading.value} exceeded threshold {threshold}.',
+                subject='Sensor Alert - Action Needed',
+                message=f'Sensor {device.serial_number} value {reading.value} exceeded threshold {alert_threshold}.',
                 from_email=settings.NOTIFICATIONS_FROM_EMAIL,
                 recipient_list=[user.email],
                 fail_silently=True,
             )
+    elif reading.value > warning_threshold:
+        for user in device.users.filter(profile__alert_email_enabled=True):
+            send_mail(
+                subject='Sensor Warning',
+                message=f'Sensor {device.serial_number} value {reading.value} exceeded threshold {warning_threshold}.',
+                from_email=settings.NOTIFICATIONS_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=True,
+            )
+    

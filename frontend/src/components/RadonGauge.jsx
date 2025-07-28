@@ -1,10 +1,14 @@
 import GaugeComponent from 'react-gauge-component';
 
-const DEFAULT_THRESHOLD = 200;
-const envThreshold = Number(import.meta.env.VITE_RADON_THRESHOLD) || DEFAULT_THRESHOLD;
+const DEFAULT_ALERT_THRESHOLD = 200;
+const DEFAULT_WARNING_THRESHOLD = 150;
+const envAlertThreshold = Number(import.meta.env.RADON_ALERT_THRESHOLD) || DEFAULT_ALERT_THRESHOLD;
+const envWarningThreshold = Number(import.meta.env.RADON_WARNING_THRESHOLD) || DEFAULT_WARNING_THRESHOLD;
 
-function RadonGauge({ value, min = 0, max = 400, threshold }) {
-  const usedThreshold = typeof threshold === 'number' ? threshold : envThreshold;
+function RadonGauge({ value, min = 0, max = 400, alertThreshold, warningThreshold }) {
+  const usedAlertThreshold = typeof alertThreshold === 'number' ? alertThreshold : envAlertThreshold;
+  const usedWarningThreshold = typeof warningThreshold === 'number' ? warningThreshold : envWarningThreshold;
+  
   return (
     <GaugeComponent
       type="semicircle"
@@ -15,7 +19,8 @@ function RadonGauge({ value, min = 0, max = 400, threshold }) {
         width: 0.2,
         padding: 0.005,
         subArcs: [
-          { limit: usedThreshold, color: '#5BE12C', showTick: true }, // green
+          { limit: usedWarningThreshold, color: '#5BE12C', showTick: true }, // green
+          { limit: usedAlertThreshold, color: '#F5CD3D', showTick: true }, // yellow/amber
           { color: '#EA4228', showTick: true }, // red
         ],
       }}
