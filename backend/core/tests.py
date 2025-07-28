@@ -276,11 +276,11 @@ class DeviceDashboardTests(APITestCase):
         self.assertIn('trend', response.data)
         self.assertEqual(response.data['recent_reading']['value'], 10)
         # 7 days: 10, 20 (avg 15.0)
-        self.assertAlmostEqual(response.data['averages']['7_days'], 15.0)
+        self.assertEqual(response.data['averages']['7_days'], 15.0)
         # 24 days: 10, 20, 30 (avg 20.0)
-        self.assertAlmostEqual(response.data['averages']['24_hours'], 10.0)
+        self.assertEqual(response.data['averages']['24_hours'], 10.0)
         # 30 days: 10, 20, 30, 40 (avg 25.0)
-        self.assertAlmostEqual(response.data['averages']['30_days'], 25.0)
+        self.assertEqual(response.data['averages']['30_days'], 25.0)
         self.assertEqual(len(response.data['trend']), 4)
 
     def test_dashboard_device_not_found(self):

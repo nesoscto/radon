@@ -1,6 +1,5 @@
-from email import message
-import re
-from django.shortcuts import render
+from decimal import Decimal as D
+
 from django.contrib.auth.models import User
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
@@ -11,10 +10,8 @@ from .auth import CentralCollectorAPIKeyAuthentication
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordResetForm
 from django.conf import settings
-from rest_framework.authentication import TokenAuthentication
 from django.utils import timezone
 from datetime import timedelta
-from django.template.loader import render_to_string
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_decode
 from rest_framework.permissions import IsAuthenticated
@@ -130,7 +127,7 @@ class DeviceDashboardView(APIView):
         def avg_for_days(days):
             since = now - timedelta(days=days)
             vals = readings.filter(timestamp__gte=since).values_list('value', flat=True)
-            return sum(vals)/len(vals) if vals else None
+            return D(sum(vals)/len(vals)).quantize(D('0.01')) if vals else None
         averages = {
             '24_hours': avg_for_days(1),
             '7_days': avg_for_days(7),
