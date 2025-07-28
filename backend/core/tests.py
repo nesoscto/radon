@@ -1,8 +1,8 @@
+from webbrowser import get
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APITestCase
-from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from .models import UserProfile, Device, SensorReading
 from .sensor import process_message
@@ -11,12 +11,21 @@ from django.core import mail
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework_simplejwt.tokens import AccessToken
+from django.contrib.auth import get_user_model
 
-# Create your tests here.
+
+User = get_user_model()
+
+
+def create_test_user(username, email, password):
+    user = User.objects.create_user(username=username, email=email, password=password)
+    user.emailaddress_set.create(email=email, primary=True, verified=True)
+    return user
+
 
 class ProfileViewTests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', email='test@example.com', password='testpass123')
+        self.user = create_test_user(username='testuser', email='test@example.com', password='testpass123')
         self.profile = self.user.profile
         self.access_token = str(AccessToken.for_user(self.user))
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.access_token)
@@ -41,7 +50,7 @@ class ProfileViewTests(APITestCase):
 
 class PasswordChangeViewTests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='changepass', email='change@example.com', password='oldpass123')
+        self.user = create_test_user(username='changepass', email='change@example.com', password='oldpass123')
         self.access_token = str(AccessToken.for_user(self.user))
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.access_token)
         self.url = reverse('password_change')
@@ -62,7 +71,7 @@ class PasswordChangeViewTests(APITestCase):
 
 class PasswordResetViewTests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='resetuser', email='reset@example.com', password='resetpass123')
+        self.user = create_test_user(username='resetuser', email='reset@example.com', password='resetpass123')
         self.url = reverse('password_reset')
 
     def test_password_reset_email_sent(self):
@@ -79,7 +88,7 @@ class PasswordResetViewTests(APITestCase):
 
 class DeviceAPITests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='devuser', email='dev@example.com', password='devpass123')
+        self.user = create_test_user(username='devuser', email='dev@example.com', password='devpass123')
         self.access_token = str(AccessToken.for_user(self.user))
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.access_token)
         self.device1 = Device.objects.create(serial_number='SN123')
@@ -107,7 +116,7 @@ class DeviceAPITests(APITestCase):
         self.assertEqual(response.status_code, 400, response.json())
 
     def test_create_device_different_user_same_serial_number(self):
-        other_user = User.objects.create_user(username='devuser2', email='dev2@example.com', password='devpass123')
+        other_user = create_test_user(username='devuser2', email='dev2@example.com', password='devpass123')
         other_access_token = str(AccessToken.for_user(other_user))
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + other_access_token)
         data = {'serial_number': 'SN123'}
@@ -122,7 +131,7 @@ class DeviceAPITests(APITestCase):
         self.assertEqual(response.data['serial_number'], 'SN123')
 
     def test_cannot_access_others_device(self):
-        other_user = User.objects.create_user(username='other', email='other@example.com', password='otherpass')
+        other_user = create_test_user(username='other', email='other@example.com', password='otherpass')
         other_device = Device.objects.create(serial_number='SN999')
         other_device.users.add(other_user)
         detail_url = reverse('device-detail', args=[other_device.pk])
@@ -131,7 +140,7 @@ class DeviceAPITests(APITestCase):
 
 class SensorReadingIngestTests(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='sensoruser', email='sensor@example.com', password='sensorpass')
+        self.user = create_test_user(username='sensoruser', email='sensor@example.com', password='sensorpass')
         self.device = Device.objects.create(serial_number='0123456789abcd11')
         self.device.users.add(self.user)
         self.base_payload = {
@@ -183,7 +192,7 @@ class SensorReadingIngestTests(TestCase):
         self.assertIn('Sensor Alert - Action Needed', mail.outbox[0].subject)
 
     def test_alert_triggered_multiple_users(self):
-        user2 = User.objects.create_user(username='sensoruser2', email='sensor2@example.com', password='sensorpass2')
+        user2 = create_test_user(username='sensoruser2', email='sensor2@example.com', password='sensorpass2')
         self.device.users.add(user2)
         payload = self.base_payload.copy()
         payload["object"] = {"hexdata": "201"}
@@ -207,7 +216,7 @@ class SensorReadingIngestTests(TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     def test_alert_respects_profile_toggle_multiple_users(self):
-        user2 = User.objects.create_user(username='sensoruser2', email='sensor2@example.com', password='sensorpass2')
+        user2 = create_test_user(username='sensoruser2', email='sensor2@example.com', password='sensorpass2')
         self.device.users.add(user2)
         # Only user2 has alerts enabled
         self.user.profile.alert_email_enabled = False
@@ -246,7 +255,7 @@ class SensorReadingIngestTests(TestCase):
 
 class DeviceDashboardTests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='dashuser', email='dash@example.com', password='dashpass')
+        self.user = create_test_user(username='dashuser', email='dash@example.com', password='dashpass')
         self.access_token = str(AccessToken.for_user(self.user))
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.access_token)
         self.device = Device.objects.create(serial_number='DASH123')
@@ -281,7 +290,7 @@ class DeviceDashboardTests(APITestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_dashboard_permission(self):
-        other_user = User.objects.create_user(username='otherdash', email='otherdash@example.com', password='otherpass')
+        other_user = create_test_user(username='otherdash', email='otherdash@example.com', password='otherpass')
         other_access_token = str(AccessToken.for_user(other_user))
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + other_access_token)
         response = self.client.get(self.url)

@@ -1,4 +1,5 @@
 import json
+from functools import lru_cache
 import paho.mqtt.client as mqtt
 from django.conf import settings
 
@@ -25,12 +26,10 @@ def on_disconnect(mqtt_client, userdata, rc):
     logger.info('Disconnected from MQTT broker')
 
 
-client = None
 
+@lru_cache
 def set_up_client():
-    global client
-    if client:
-        return
+    logging.info('Setting up MQTT client')
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     client.on_connect = on_connect
     client.on_message = on_message
@@ -45,5 +44,4 @@ def set_up_client():
         keepalive=settings.MQTT_KEEPALIVE
     )
     client.loop_start()
-
-#set_up_client()
+    return client

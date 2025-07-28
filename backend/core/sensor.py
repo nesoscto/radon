@@ -59,20 +59,22 @@ def process_message(obj):
     warning_threshold = settings.SENSOR_WARNING_THRESHOLD
     if reading.value > alert_threshold:
         for user in device.users.filter(profile__alert_email_enabled=True):
+            user_email = user.emailaddress_set.get(primary=True, verified=True).email
             send_mail(
                 subject='Sensor Alert - Action Needed',
                 message=f'Sensor {device.serial_number} value {reading.value} exceeded threshold {alert_threshold}.',
                 from_email=settings.NOTIFICATIONS_FROM_EMAIL,
-                recipient_list=[user.email],
+                recipient_list=[user_email],
                 fail_silently=True,
             )
     elif reading.value > warning_threshold:
         for user in device.users.filter(profile__alert_email_enabled=True):
+            user_email = user.emailaddress_set.get(primary=True, verified=True).email
             send_mail(
                 subject='Sensor Warning',
                 message=f'Sensor {device.serial_number} value {reading.value} exceeded threshold {warning_threshold}.',
                 from_email=settings.NOTIFICATIONS_FROM_EMAIL,
-                recipient_list=[user.email],
+                recipient_list=[user_email],
                 fail_silently=True,
             )
     

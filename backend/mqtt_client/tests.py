@@ -1,6 +1,6 @@
 import json
 from django.test import TestCase
-from django.contrib.auth import get_user_model
+from core.tests import create_test_user
 from core.models import Device, SensorReading
 from mqtt_client.mqtt_client import on_message
 from pathlib import Path
@@ -10,7 +10,7 @@ from types import SimpleNamespace
 
 class MqttClientTestCase(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username='testuser', password='testpass', email='test@example.com')
+        self.user = create_test_user(username='testuser', password='testpass', email='test@example.com')
         self.device = Device.objects.create(serial_number='0123456789abcd13')
         self.device.users.add(self.user)
         # Ensure user profile exists and alert_email_enabled is True
