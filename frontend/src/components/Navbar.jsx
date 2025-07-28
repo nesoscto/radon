@@ -4,6 +4,7 @@ import { Link as RouterLink, useLocation } from 'react-router-dom';
 import LogoutButton from './LogoutButton';
 import { isAuthenticated } from '../api/client';
 import { useState } from 'react';
+import nesosLogo from '../assets/nesos-logo.png';
 
 function Navbar() {
   const location = useLocation();
@@ -31,24 +32,28 @@ function Navbar() {
   return (
     <AppBar position="static" color="primary" sx={{ mb: 4 }}>
       <Toolbar>
-        <Typography
-          variant="h6"
+        <Box
           component={RouterLink}
           to="/dashboard"
           sx={{
             flexGrow: 1,
-            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
             textDecoration: 'none',
-            fontWeight: 'bold',
             '&:hover, &:focus': {
-              color: '#fff',
-              textDecoration: 'underline',
               backgroundColor: 'transparent',
             },
           }}
         >
-          LoRaWAN Radon Sensor
-        </Typography>
+          <img 
+            src={nesosLogo} 
+            alt="Nesos Group Logo" 
+            style={{ 
+              height: '40px', 
+              width: 'auto'
+            }} 
+          />
+        </Box>
         {isDesktop ? (
           <>
             {navLinks.map(link => (

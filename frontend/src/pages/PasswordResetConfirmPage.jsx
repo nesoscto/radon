@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { TextField, Button, Box, Typography, Alert, Container } from '@mui/material';
 import api from '../api/client';
+import nesosLogoBlue from '../assets/nesos-logo-blue.png';
 
 function PasswordResetConfirmPage() {
   const { uidb64, token } = useParams();
@@ -34,6 +35,15 @@ function PasswordResetConfirmPage() {
   return (
     <Container maxWidth="xs">
       <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <img 
+          src={nesosLogoBlue} 
+          alt="Nesos Group Logo" 
+          style={{ 
+            height: '60px', 
+            width: 'auto',
+            marginBottom: '24px'
+          }} 
+        />
         <Typography component="h1" variant="h5">Set New Password</Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
           <TextField

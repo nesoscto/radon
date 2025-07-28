@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TextField, Button, Box, Typography, Alert, Container } from '@mui/material';
 import api from '../api/client';
+import nesosLogoBlue from '../assets/nesos-logo-blue.png';
 
 function PasswordResetPage() {
   const [email, setEmail] = useState('');
@@ -22,6 +23,15 @@ function PasswordResetPage() {
   return (
     <Container maxWidth="xs">
       <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <img 
+          src={nesosLogoBlue} 
+          alt="Nesos Group Logo" 
+          style={{ 
+            height: '60px', 
+            width: 'auto',
+            marginBottom: '24px'
+          }} 
+        />
         <Typography component="h1" variant="h5">Password Recovery</Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
           <TextField
