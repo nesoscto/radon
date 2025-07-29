@@ -105,21 +105,23 @@ class DeviceAPITests(APITestCase):
         self.assertIn('SN456', serials)
 
     def test_create_device(self):
-        data = {'serial_number': 'SN789'}
+        data = {'serial_number': 'SN789', "name": "Test Device"}
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, 201, response.json())
         self.assertTrue(Device.objects.filter(serial_number='SN789', users=self.user).exists())
 
     def test_create_duplicate_device_fails(self):
-        data = {'serial_number': 'SN123'}
+        data = {'serial_number': 'SN123', "name": "Test Device"}
         response = self.client.post(self.url, data)
-        self.assertEqual(response.status_code, 400, response.json())
+        self.assertEqual(response.status_code, 400)
+        res = response.json()
+        self.assertEqual(res, {'detail': 'Device already added.'})
 
     def test_create_device_different_user_same_serial_number(self):
         other_user = create_test_user(username='devuser2', email='dev2@example.com', password='devpass123')
         other_access_token = str(AccessToken.for_user(other_user))
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + other_access_token)
-        data = {'serial_number': 'SN123'}
+        data = {'serial_number': 'SN123', "name": "Test Device"}
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, 201, response.json())
         self.assertEqual(list(self.device1.users.all().values_list('id', flat=True)), [self.user.id, other_user.id])

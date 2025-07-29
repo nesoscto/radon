@@ -62,7 +62,7 @@ def process_message(obj):
             user_email = user.emailaddress_set.get(primary=True, verified=True).email
             send_mail(
                 subject='Sensor Alert - Action Needed',
-                message=f'Sensor {device.serial_number} value {reading.value} exceeded threshold {alert_threshold}.',
+                message=f'Sensor {device.name} ({device.serial_number}) value {reading.value} exceeded threshold {alert_threshold}.',
                 from_email=settings.NOTIFICATIONS_FROM_EMAIL,
                 recipient_list=[user_email],
                 fail_silently=True,
@@ -72,7 +72,7 @@ def process_message(obj):
             user_email = user.emailaddress_set.get(primary=True, verified=True).email
             send_mail(
                 subject='Sensor Warning',
-                message=f'Sensor {device.serial_number} value {reading.value} exceeded threshold {warning_threshold}.',
+                message=f'Sensor {device.name} ({device.serial_number}) value {reading.value} exceeded threshold {warning_threshold}.',
                 from_email=settings.NOTIFICATIONS_FROM_EMAIL,
                 recipient_list=[user_email],
                 fail_silently=True,

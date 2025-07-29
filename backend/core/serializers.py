@@ -19,7 +19,7 @@ class PasswordChangeSerializer(serializers.Serializer):
 class DeviceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Device
-        fields = ['id', 'serial_number', 'date_created', 'date_updated', "users"]
+        fields = ['id', 'serial_number', 'date_created', 'date_updated', "users", "name"]
         read_only_fields = ['id', 'date_created', 'date_updated']
         extra_kwargs = {'users': {'required': False}}
 

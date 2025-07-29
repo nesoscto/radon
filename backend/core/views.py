@@ -91,8 +91,13 @@ class DeviceListCreateView(generics.ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         serial_number = request.data.get('serial_number')
+        name = request.data.get('name')
+        
         if not serial_number:
             return Response({'serial_number': 'This field is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not name:
+            return Response({'name': 'This field is required.'}, status=status.HTTP_400_BAD_REQUEST)
+            
         if device := Device.objects.filter(serial_number=serial_number).first():
             if self.request.user in device.users.all():
                 return Response({'detail': 'Device already added.'}, status=status.HTTP_400_BAD_REQUEST)

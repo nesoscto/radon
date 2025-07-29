@@ -42,7 +42,7 @@ function DeviceDashboard({ device }) {
   return (
     <Card sx={{ mb: 4 }}>
       <CardContent>
-        <Typography variant="h6" sx={{ mb: 2 }}>Device: {device.serial_number}</Typography>
+        <Typography variant="h6" sx={{ mb: 2 }}>{device.name || device.serial_number} ({device.serial_number})</Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
           <RadonGauge 
             value={recent_reading.value ?? 0} 

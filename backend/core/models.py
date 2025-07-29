@@ -27,6 +27,7 @@ def create_user_profile(sender, instance, created, **kwargs):
         UserProfile.objects.create(user=instance)
 
 class Device(TimeStampedModel):
+    name = models.CharField(max_length=100, blank=False)  # 100 comes from Mediminder
     # alphanumeric EUI-64
     serial_number = models.CharField(max_length=64, unique=True)
     users = models.ManyToManyField(User, related_name='devices', blank=True)
