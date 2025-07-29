@@ -43,5 +43,4 @@ def set_up_client():
         port=settings.MQTT_BROKER_PORT,
         keepalive=settings.MQTT_KEEPALIVE
     )
-    client.loop_start()
     return client

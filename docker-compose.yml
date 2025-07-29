@@ -30,6 +30,23 @@ services:
     depends_on:
       - db
       - maildev
+  mqtt_client:
+    build: ./backend
+    command: sh -c "python manage.py startmqttclient"
+    volumes:
+      - ./backend:/app
+    environment:
+      - DEBUG=1
+      - DJANGO_DB_HOST=db
+      - DJANGO_DB_NAME=radon
+      - DJANGO_DB_USER=radonuser
+      - DJANGO_DB_PASSWORD=radonpass
+      - EMAIL_HOST=maildev
+      - EMAIL_PORT=1025
+      - HOSTNAME=localhost
+    depends_on:
+      - db
+      - maildev
 
   frontend:
     build: ./frontend
