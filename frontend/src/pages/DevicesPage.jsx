@@ -13,11 +13,14 @@ import {
   DialogContent, 
   CircularProgress,
   TextField,
-  Grid
+  Grid,
+  IconButton,
+  DialogActions
 } from '@mui/material';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import AddIcon from '@mui/icons-material/Add';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
+import DeleteIcon from '@mui/icons-material/Delete';
 import api from '../api/client';
 
 function DevicesPage() {
@@ -33,6 +36,8 @@ function DevicesPage() {
     serial_number: ''
   });
   const [formErrors, setFormErrors] = useState({});
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deviceToDelete, setDeviceToDelete] = useState(null);
 
   const fetchDevices = async () => {
     setLoading(true);
@@ -117,6 +122,25 @@ function DevicesPage() {
     }
   };
 
+  const handleDeleteClick = (device) => {
+    setDeviceToDelete(device);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deviceToDelete) return;
+    
+    try {
+      await api.delete(`/devices/${deviceToDelete.id}/`);
+      setSuccess('Device deleted successfully!');
+      setDeleteDialogOpen(false);
+      setDeviceToDelete(null);
+      fetchDevices();
+    } catch (err) {
+      setError('Failed to delete device.');
+    }
+  };
+
   return (
     <Container maxWidth="md" sx={{ px: { xs: 1, sm: 2, md: 4 } }}>
       <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -144,6 +168,14 @@ function DevicesPage() {
                     primary={device.name || device.serial_number}
                     secondary={`${device.serial_number} • Added: ${new Date(device.date_created).toLocaleString()}`}
                   />
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={() => handleDeleteClick(device)}
+                    color="error"
+                  >
+                    <DeleteIcon />
+                  </IconButton>
                 </ListItem>
               ))
             )}
@@ -222,6 +254,29 @@ function DevicesPage() {
             />
             <Button onClick={() => setQrOpen(false)} sx={{ mt: 2 }}>Cancel</Button>
           </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+          <DialogTitle>Delete Device</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Do you really want to delete this device?
+            </Typography>
+            {deviceToDelete && (
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                {deviceToDelete.name || deviceToDelete.serial_number} ({deviceToDelete.serial_number})
+              </Typography>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleDeleteConfirm} color="error" variant="contained">
+              Delete
+            </Button>
+          </DialogActions>
         </Dialog>
       </Box>
     </Container>

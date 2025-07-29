@@ -140,6 +140,15 @@ class DeviceAPITests(APITestCase):
         response = self.client.get(detail_url)
         self.assertEqual(response.status_code, 404)
 
+    def test_delete_device(self):
+        other_user = create_test_user(username='other', email='other@example.com', password='otherpass')
+        self.device1.users.add(other_user)
+        self.assertEqual(self.device1.users.count(), 2)
+        detail_url = reverse('device-detail', args=[self.device1.pk])
+        response = self.client.delete(detail_url)
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(self.device1.users.count(), 1)
+
 class SensorReadingIngestTests(TestCase):
     def setUp(self):
         self.user = create_test_user(username='sensoruser', email='sensor@example.com', password='sensorpass')

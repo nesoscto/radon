@@ -117,6 +117,12 @@ class DeviceDetailView(generics.RetrieveAPIView):
     def get_queryset(self):
         return self.request.user.devices.all()
 
+    def delete(self, request, *args, **kwargs):
+        device = self.get_object()
+        device.users.remove(request.user)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class DeviceDashboardView(APIView):
     permission_classes = [IsAuthenticated]
 
