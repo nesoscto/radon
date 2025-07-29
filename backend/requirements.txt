@@ -7,3 +7,4 @@ django-allauth==65.3.0
 dj-rest-auth
 requests
 paho-mqtt
+gunicorn
