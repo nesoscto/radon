@@ -1,0 +1,2 @@
+FROM nmfm/radonapp-test:<version>
+CMD ["python", "manage.py", "startmqttclient"]

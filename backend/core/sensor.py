@@ -57,6 +57,7 @@ def process_message(obj):
     # Alert logic
     alert_threshold = settings.SENSOR_ALERT_THRESHOLD
     warning_threshold = settings.SENSOR_WARNING_THRESHOLD
+    logger.debug("Email using TLS: %s", settings.EMAIL_USE_TLS)
     if reading.value > alert_threshold:
         for user in device.users.filter(profile__alert_email_enabled=True):
             user_email = user.emailaddress_set.get(primary=True, verified=True).email
