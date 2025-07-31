@@ -44,7 +44,7 @@ function PasswordResetPage() {
           }}
         >
           <img 
-            src={nesosLogoBlue} 
+            src={nesosLogoBlue}
             alt="Nesos Group Logo" 
             style={{ 
               width: '320px', 

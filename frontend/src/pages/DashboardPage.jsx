@@ -41,8 +41,19 @@ function DeviceDashboard({ device }) {
 
   return (
     <Card sx={{ mb: 4 }}>
+      <Box sx={{ 
+        bgcolor: 'primary.main', 
+        color: 'white', 
+        px: 2, 
+        py: 1,
+        borderTopLeftRadius: 4,
+        borderTopRightRadius: 4
+      }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+          {device.name || device.serial_number} ({device.serial_number})
+        </Typography>
+      </Box>
       <CardContent>
-        <Typography variant="h6" sx={{ mb: 2 }}>{device.name || device.serial_number} ({device.serial_number})</Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
           <RadonGauge 
             value={recent_reading.value ?? 0} 
@@ -74,24 +85,58 @@ function DeviceDashboard({ device }) {
           </ResponsiveContainer>
         </Box>
         <Divider sx={{ my: 2 }} />
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={4}>
-            <Typography variant="subtitle2">Recent Reading</Typography>
-            <Typography>Value: {recent_reading.value ?? 'N/A'} <Typography component="span" variant="body2">{recent_reading.value ? units : ''}</Typography></Typography>
-            <Typography>RSSI: {recent_reading.rssi ?? 'N/A'}</Typography>
-            <Typography>Time: {recent_reading.timestamp ? new Date(recent_reading.timestamp).toLocaleString() : 'N/A'}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Typography variant="subtitle2">Averages ({units})</Typography>
-            <Typography>24 hours: {averages['24_hours'] ?? 'N/A'}</Typography>
-            <Typography>7 days: {averages['7_days'] ?? 'N/A'}</Typography>
-            <Typography>30 days: {averages['30_days'] ?? 'N/A'}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Typography variant="subtitle2">Details</Typography>
-            <Typography>Device: {device.serial_number}</Typography>
-          </Grid>
-        </Grid>
+        <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+          <Card variant="outlined" sx={{ p: 2, flex: { xs: 'none', sm: '1 1 0%' } }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Recent Reading</Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 2 }}>
+                  <Typography variant="body2" color="text.secondary">Value:</Typography>
+                  <Typography variant="body1" fontWeight="medium">
+                    {recent_reading.value ?? 'N/A'} {recent_reading.value ? units : ''}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 2 }}>
+                  <Typography variant="body2" color="text.secondary">RSSI:</Typography>
+                  <Typography variant="body1" fontWeight="medium">{recent_reading.rssi ?? 'N/A'}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 2 }}>
+                  <Typography variant="body2" color="text.secondary">Time:</Typography>
+                  <Typography variant="body1" fontWeight="medium">
+                    {recent_reading.timestamp ? new Date(recent_reading.timestamp).toLocaleDateString('en-GB', { 
+                      day: '2-digit', 
+                      month: '2-digit', 
+                      year: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    }) : 'N/A'}
+                  </Typography>
+                </Box>
+              </Box>
+            </Card>
+            <Card variant="outlined" sx={{ p: 2, flex: { xs: 'none', sm: '1 1 0%' } }}>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Averages</Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 2 }}>
+                  <Typography variant="body2" color="text.secondary">24 hours:</Typography>
+                  <Typography variant="body1" fontWeight="medium">
+                    {averages['24_hours'] ?? 'N/A'} {units}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 2 }}>
+                  <Typography variant="body2" color="text.secondary">7 days:</Typography>
+                  <Typography variant="body1" fontWeight="medium">
+                    {averages['7_days'] ?? 'N/A'} {units}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 2 }}>
+                  <Typography variant="body2" color="text.secondary">30 days:</Typography>
+                  <Typography variant="body1" fontWeight="medium">
+                    {averages['30_days'] ?? 'N/A'} {units}
+                  </Typography>
+                </Box>
+                              </Box>
+              </Card>
+            </Box>
       </CardContent>
     </Card>
   );
@@ -114,20 +159,29 @@ function DashboardPage() {
   return (
     <Container maxWidth="lg" sx={{ px: { xs: 1, sm: 2, md: 4 } }}>
       <Box sx={{ mt: 2 }}>
-        <Typography variant="h4" gutterBottom>Dashboard</Typography>
+        <Typography variant="h4" gutterBottom align="center">Dashboard</Typography>
         {loading && <CircularProgress sx={{ my: 2 }} />}
         {error && <Alert severity="error">{error}</Alert>}
         {!loading && !error && devices.length === 0 && (
           <Alert severity="info">No devices found. Add a device to see dashboard data.</Alert>
         )}
         {!loading && !error && (
-          <Grid container spacing={3}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            width: '100%',
+            flexWrap: 'wrap',
+            gap: 3
+          }}>
             {devices.map(device => (
-              <Grid item xs={12} md={6} lg={4} key={device.id}>
+              <Box key={device.id} sx={{ 
+                width: { xs: '100%', md: 'calc(50% - 12px)' },
+                maxWidth: 600
+              }}>
                 <DeviceDashboard device={device} />
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         )}
       </Box>
     </Container>

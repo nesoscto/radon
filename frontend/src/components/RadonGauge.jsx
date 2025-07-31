@@ -33,7 +33,7 @@ function RadonGauge({ value, min = 0, max = 2500, alertThreshold, warningThresho
       labels={{
         valueLabel: {
           formatTextValue: v => `${v} bq/m³`,
-          style: { fontSize: 32, fill: '#222', fontWeight: 'bold' },
+          style: { fontSize: 32, fill: '#222', fontWeight: 'normal' },
         },
         tickLabels: {
           type: 'outer',
