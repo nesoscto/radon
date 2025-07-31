@@ -35,8 +35,7 @@ def set_up_client():
     client.on_message = on_message
     client.enable_logger()
     import ssl
-    client.tls_set(cert_reqs=ssl.CERT_NONE)
-    client.tls_insecure_set(True)
+    client.tls_set()
     client.username_pw_set(settings.MQTT_BROKER_USERNAME, settings.MQTT_BROKER_PASSWORD)
     client.connect(
         host=settings.MQTT_BROKER_URL,
