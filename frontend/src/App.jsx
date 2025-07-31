@@ -1,17 +1,14 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from './theme';
-import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import DevicesPage from './pages/DevicesPage';
 import ProfilePage from './pages/ProfilePage';
-import LogoutButton from './components/LogoutButton';
 import ProtectedRoute from './components/ProtectedRoute';
 import PasswordResetPage from './pages/PasswordResetPage';
 import PasswordResetConfirmPage from './pages/PasswordResetConfirmPage';
-import { Box } from '@mui/material';
 import { isAuthenticated } from './api/client';
 import Navbar from './components/Navbar';
 
@@ -21,7 +18,7 @@ function App() {
       <Router>
         <Navbar />
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />} />
           <Route path="/login" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
           <Route path="/register" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <RegisterPage />} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />

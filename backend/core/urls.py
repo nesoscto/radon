@@ -5,7 +5,6 @@ from django.contrib.auth import views as auth_views
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
-    #path('register/', RegisterView.as_view(), name='register'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('password-change/', PasswordChangeView.as_view(), name='password_change'),
     path('password-reset/', PasswordResetView.as_view(), name='password_reset'),
@@ -13,7 +12,4 @@ urlpatterns = [
     path('devices/', DeviceListCreateView.as_view(), name='device-list-create'),
     path('devices/<int:pk>/', DeviceDetailView.as_view(), name='device-detail'),
     path('devices/<str:serial_number>/dashboard/', DeviceDashboardView.as_view(), name='device-dashboard'),
-    #path('sensor-ingest/', SensorReadingIngestView.as_view(), name='sensor-ingest'),
-    #path('jwt/login/', TokenObtainPairView.as_view(), name='jwt-login'),
-    #path('jwt/refresh/', TokenRefreshView.as_view(), name='jwt-refresh'),
 ] 

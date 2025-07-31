@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TextField, Button, Box, Typography, Alert, Container } from '@mui/material';
+import { TextField, Button, Box, Typography, Alert, Container, Card, CardContent } from '@mui/material';
 import api from '../api/client';
 import { Link as RouterLink } from 'react-router-dom';
 import Link from '@mui/material/Link';
@@ -30,18 +30,38 @@ function LoginPage() {
   };
 
   return (
-    <Container maxWidth="xs">
-      <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <img 
-          src={nesosLogoBlue} 
-          alt="Nesos Group Logo" 
-          style={{ 
-            height: '60px', 
-            width: 'auto',
-            marginBottom: '24px'
-          }} 
-        />
-        <Typography component="h1" variant="h5">Login</Typography>
+    <Box sx={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center' 
+    }}>
+      <Container maxWidth="xs">
+        <Card sx={{ p: 3, boxShadow: 3 }}>
+          <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box
+          component={RouterLink}
+          to="/"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            textDecoration: 'none',
+            '&:hover': {
+              opacity: 0.8,
+            },
+          }}
+        >
+          <img 
+            src={nesosLogoBlue} 
+            alt="Nesos Group Logo" 
+            style={{ 
+              width: '320px', 
+              height: 'auto',
+              marginBottom: '48px'
+            }} 
+          />
+        </Box>
+        <Typography component="h1" variant="h4" sx={{ fontWeight: "bold"}}>Login</Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
           <TextField
             margin="normal"
@@ -66,13 +86,18 @@ function LoginPage() {
             Login
           </Button>
         </Box>
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
           <Link component={RouterLink} to="/password-reset" variant="body2">
             Forgot password?
           </Link>
+          <Link component={RouterLink} to="/register" variant="body2">
+            Create a new account
+          </Link>
         </Box>
-      </Box>
-    </Container>
+                </CardContent>
+        </Card>
+      </Container>
+    </Box>
   );
 }
 
